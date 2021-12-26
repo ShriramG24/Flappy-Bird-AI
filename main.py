@@ -1,11 +1,10 @@
-import random
 import pygame
-from pipes import Pipes
+import gym
 from display import Display
 from sprite import Sprite
 
 pygame.init()
-fps = 50
+fps = 45
 win_width = 500
 win_height = 600
 

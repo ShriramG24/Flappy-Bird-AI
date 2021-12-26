@@ -2,6 +2,7 @@ import pygame
 import math
 pygame.init()
 
+
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, filenames, x, y, w, h):
         super(Sprite, self).__init__()
@@ -11,7 +12,6 @@ class Sprite(pygame.sprite.Sprite):
         self.x, self.y, self.w, self.h = x, y, w, h
         self.del_vel = 0
         self.hitbox = pygame.Rect(self.x, self.y, self.w, self.h)
-
 
     def set_img(self, imgs):
         self.images = [pygame.image.load(img) for img in imgs]
@@ -23,7 +23,7 @@ class Sprite(pygame.sprite.Sprite):
         return self.images[self.curr_img]
 
     def get_loc(self):
-        return (self.x, self.y)
+        return self.x, self.y
 
     def get_hb(self):
         return self.hitbox

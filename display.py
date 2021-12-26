@@ -23,6 +23,7 @@ class Display:
         self.obstacles = obstacles  # list of obstacle sprites
         self.score = 0
         self.scores = [0]
+        self.clock = pygame.time.Clock()
 
     def restart(self):
         global x_bg, pipe_x, pipes, pipes_hb
@@ -69,10 +70,9 @@ class Display:
                         self.bools["paused"] = True
 
     def main_loop(self, fps):
-        clock = pygame.time.Clock()
         global x_bg
         while self.bools["running"]:
-            clock.tick(fps)
+            self.clock.tick(fps)
             self.event_loop()
 
             if self.sprites.get_loc()[1] >= self.height - 35 or \
@@ -176,3 +176,19 @@ class Display:
         font = pygame.font.Font("Sprites/EightBitDragon-anqx.ttf", size)
         font = font.render(text, True, (0, 0, 0))
         self.window.blit(font, pos)
+
+    def run_frame(self):
+        pass
+
+    def step(self, action):
+        # action: 0 - jump, 1 - do nothing
+        reward, done = 0
+        if action == 0:
+            self.sprites.jump()
+            reward -= 0.1
+
+        self.run_frame()
+
+        state = [self.sprites.get_hb(), pipes_hb, self.sprites.del_vel]
+
+        return reward, state, done
