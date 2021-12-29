@@ -1,3 +1,6 @@
-pygame
+pygame~=2.1.0
 random
 math
+gym~=0.21.0
+numpy~=1.21.5
+opencv-python~=4.5.5.62

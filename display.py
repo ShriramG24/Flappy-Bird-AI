@@ -25,7 +25,7 @@ class Display:
         self.scores = [0]
         self.clock = pygame.time.Clock()
 
-    def restart(self):
+    def reset(self):
         global x_bg, pipe_x, pipes, pipes_hb
         self.bools = {key: False for (key, value) in self.bools.items()}
         self.bools["running"] = True
@@ -37,6 +37,9 @@ class Display:
         pipes = []
         pipes_hb = []
         self.score = 0
+
+    def restart(self):
+        self.reset()
         self.main_loop(50)
 
     def event_loop(self):
@@ -94,7 +97,7 @@ class Display:
                     pipe.move_back(5)
                     if pipe.get_loc()[0] < -300:
                         pipes.pop(pipes.index(pipe))
-                    if self.sprites.get_loc()[0] >= pipe.get_loc()[0] + 82 and not pipe._passed():
+                    if self.sprites.get_loc()[0] >= pipe.get_loc()[0] + 82 and not pipe.passed():
                         self.score += 1
 
             else:
@@ -177,18 +180,27 @@ class Display:
         font = font.render(text, True, (0, 0, 0))
         self.window.blit(font, pos)
 
-    def run_frame(self):
-        pass
+    def draw_frame(self, fps):
+        self.clock.tick(fps)
+        self.bools["started"] = True
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
 
-    def step(self, action):
-        # action: 0 - jump, 1 - do nothing
-        reward, done = 0
-        if action == 0:
-            self.sprites.jump()
-            reward -= 0.1
+        if self.sprites.get_loc()[1] >= self.height - 35 or \
+           self.sprites.get_hb().collidelist(pipes_hb) != -1:
+            return True
 
-        self.run_frame()
+        self.window.blit(self.bg, (x_bg, 0))
+        self.redraw_window()
+        self.window.blit(self.sprites.get_img(), self.sprites.get_loc())
+        self.sprites.fall(1.6)
+        for pipe in pipes:
+            pipe.move_back(5)
+            if pipe.get_loc()[0] < -300:
+                pipes.pop(pipes.index(pipe))
+            if self.sprites.get_loc()[0] >= pipe.get_loc()[0] + 82 and not pipe.passed():
+                self.score += 1
 
-        state = [self.sprites.get_hb(), pipes_hb, self.sprites.del_vel]
-
-        return reward, state, done
+        pygame.display.update()
+        return False
