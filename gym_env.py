@@ -2,13 +2,12 @@ from gym import Env, spaces
 import pygame
 from display import Display
 from sprite import Sprite
-import math
 import os
 import cv2
 
 pygame.init()
 
-FPS = 45
+FPS = 30
 WIN_WIDTH = 500
 WIN_HEIGHT = 600
 
@@ -16,7 +15,6 @@ X_BG = 0
 PIPE_X = 1000
 PIPES = []
 PIPES_HB = []
-ANGLE = math.pi / 6
 
 BG = pygame.image.load("Sprites/bg.png")
 SPRITE = Sprite(["Sprites/bird_down.png",
@@ -38,8 +36,8 @@ class FlappyBirdEnv(Env):
         self.reward = 0
         pygame.display.set_caption("Flappy Bird")
 
-    def step(self, _action):
-        if not _action:
+    def step(self, action):
+        if action == 0:
             self.reward += 2
         else:
             self.display.sprites.jump(20, 2)
