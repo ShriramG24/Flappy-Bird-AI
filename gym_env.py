@@ -1,7 +1,10 @@
 from gym import Env, spaces
 import pygame
+import torch
+import torchvision.transforms as T
 from display import Display
 from sprite import Sprite
+import numpy as np
 import os
 import cv2
 
@@ -38,45 +41,37 @@ class FlappyBirdEnv(Env):
 
     def step(self, action):
         if action == 0:
-            self.reward += 2
+            self.reward += 1
         else:
             self.display.sprites.jump(20, 2)
             self.reward -= 1
         done = self.render()
-        obs = self.process_obs()
+        obs = self.process_image()
         if done:
             self.reward -= 20
             self.reset()
 
-        return obs, self.reward, done, {}
+        return obs, torch.tensor([self.reward], device="cpu"), done, {}
 
     def reset(self):
         self.display.reset()
-        return self.process_obs()
+        return self.process_image()
 
-    def process_obs(self):
+    def process_image(self):
         pygame.image.save(self.display.window, "frame.jpg")
         frame = cv2.imread('frame.jpg')
         g_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         (thresh, bnw_frame) = cv2.threshold(g_frame, 127, 255, cv2.THRESH_BINARY)
         os.remove("frame.jpg")
-        return bnw_frame
+        bnw_frame = np.ascontiguousarray(bnw_frame, dtype=np.float32)
+        bnw_frame = torch.from_numpy(bnw_frame)
+
+        resize = T.Compose([T.ToPILImage(), T.ToTensor()])
+
+        return resize(bnw_frame).unsqueeze(0).to("cpu")
 
     def render(self, mode="human", close=False):
         return self.display.draw_frame(FPS)
 
-
-env = FlappyBirdEnv()
-for episode in range(10):
-    observation = env.reset()
-    for t in range(100):
-        env.render()
-        # print(observation)
-        action = env.action_space.sample()
-        observation, reward, done, info = env.step(action)
-        if done:
-            print("Episode finished after {} timesteps.".format(t + 1))
-            break
-env.close()
 
 
