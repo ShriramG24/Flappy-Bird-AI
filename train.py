@@ -4,20 +4,20 @@ from torch.nn import functional as F
 import torch
 
 DISCOUNT = 0.999
-BATCH_SIZE = 256
+BATCH_SIZE = 16
 E_START = 1
 E_END = 0.01
-E_DECAY = 0.01
+E_DECAY = 0.001
 TNET_UPDATE = 10
 LR = 1e-5
-NUM_EPS = 1000
-MEMORY_SIZE = 100000
+NUM_EPS = 100
+MEMORY_SIZE = 10000
 
 env = FlappyBirdEnv()
 memory = ReplayMemory(MEMORY_SIZE)
 agent = Agent(env.action_space.n, E_START, E_END, E_DECAY)
-policy = LinearDQN(env.display.width, env.display.height).to("cpu")
-target = LinearDQN(env.display.width, env.display.height).to("cpu")
+policy = LinearDQN(env.display.width, env.display.height).to(env.device)
+target = LinearDQN(env.display.width, env.display.height).to(env.device)
 
 target.load_state_dict(policy.state_dict())
 target.eval()

@@ -6,20 +6,20 @@ class Pipes:
     def __init__(self, pipe_above, x, y1, pipe_below, y2):
         self.pipe_above, self.x, self.y1 = pipe_above, x, y1
         self.pipe_below, self.y2 = pipe_below, y2
-        self.above_hitbox = pygame.Rect(self.x, self.y1 - 5000, 82, 5300)
+        self.above_hitbox = pygame.Rect(self.x, self.y1, 82, 300)
         self.below_hitbox = pygame.Rect(self.x, self.y2, 82, 300)
-        self.passed = False
+        self._passed = False
 
-    def _passed(self):
-        if not self.passed:
-            self.passed = True
+    def passed(self):
+        if not self._passed:
+            self._passed = True
             return False
         else:
             return True
 
     def move_back(self, steps):
         self.x -= steps
-        self.above_hitbox.update(self.x, self.y1 - 5000, 82, 5300)
+        self.above_hitbox.update(self.x, self.y1, 82, 300)
         self.below_hitbox.update(self.x, self.y2, 82, 300)
 
     def get_above_hb(self):
@@ -39,8 +39,7 @@ class Pipes:
 
     def store_pipes(self, pipes, pipes_hb):
         pipes.append(self)
-        pipes_hb.append(self.get_above_hb())
-        pipes_hb.append(self.get_below_hb())
+        pipes_hb.append([self.get_above_hb(), self.get_below_hb()])
         return pipes, pipes_hb
 
 

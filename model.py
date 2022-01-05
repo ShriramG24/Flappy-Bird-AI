@@ -1,12 +1,12 @@
 import torch
-from torch import nn, optim
+from torch import nn
 import torch.nn.functional as func
-from collections import deque, namedtuple
+from collections import namedtuple
 import random
 import math
-import gym
-import numpy as np
 
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 Experience = namedtuple("Experience", ("state", "action", "next_state", "reward"))
 
@@ -59,10 +59,10 @@ class Agent:
         rate = self.get_exploration_rate()
         self.current_step += 1
         if rate > random.random():
-            return torch.tensor([random.randrange(self.num_actions)]).to("cpu")
+            return torch.tensor([random.randrange(self.num_actions)]).to(device)
         else:
             with torch.no_grad():
-                return policy_net(obs).argmax(dim=1).to("cpu")
+                return policy_net(obs).argmax(dim=1).to(device)
 
 
 class QValues:
@@ -78,7 +78,7 @@ class QValues:
         non_final_state_locations = (final_state_locations == False)
         non_final_states = next_obss[non_final_state_locations]
         batch_size = next_obss.shape[0]
-        values = torch.zeros(batch_size).to("cpu")
+        values = torch.zeros(batch_size).to(device)
         values[non_final_state_locations] = target(non_final_states).max(dim=1)[0].detach()
         return values
 

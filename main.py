@@ -1,10 +1,10 @@
 import pygame
-import gym
+import neat
 from display import Display
 from sprite import Sprite
 
 pygame.init()
-fps = 45
+fps = 40
 win_width = 500
 win_height = 600
 
@@ -20,10 +20,29 @@ bools = {"jumping": False,
          "paused": False,
          "running": True}
 
-screen = Display(win_width, win_height, bg, sprite, bools, obstacles)
+screen = Display(win_width, win_height, bg, sprite, bools, obstacles, fps)
 pygame.display.set_caption("Flappy Bird")
 
 # Run Game
-screen.main_loop(fps)
+#screen.main_loop()
+
+
+# NEAT Algorithm
+def run(config_path):
+    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                                neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+
+    pop = neat.Population(config)
+    pop.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    pop.add_reporter(stats)
+    survivor = pop.run(screen.fitness_eval, 50)
+    print('\nBest genome:\n{!s}'.format(survivor))
+
+
+
+# Run AI Training
+config_pth = "net_config.txt"
+run(config_pth)
 
 pygame.quit()

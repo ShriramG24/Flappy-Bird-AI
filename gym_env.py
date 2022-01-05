@@ -15,7 +15,7 @@ WIN_WIDTH = 500
 WIN_HEIGHT = 600
 
 X_BG = 0
-PIPE_X = 1000
+PIPE_X = 400
 PIPES = []
 PIPES_HB = []
 
@@ -35,26 +35,32 @@ class FlappyBirdEnv(Env):
     def __init__(self):
         self.action_space = spaces.Discrete(2)
         self.observation_space = spaces.Box(low=0, high=1, shape=(500, 600))
-        self.display = Display(WIN_WIDTH, WIN_HEIGHT, BG, SPRITE, BOOLS, OBSTACLES)
+        self.display = Display(WIN_WIDTH, WIN_HEIGHT, BG, SPRITE, BOOLS, OBSTACLES, FPS)
         self.reward = 0
         pygame.display.set_caption("Flappy Bird")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.clock = pygame.time.Clock()
 
     def step(self, action):
         if action == 0:
             self.reward += 1
         else:
+            initial_y = self.display.sprites.get_loc()[1]
             self.display.sprites.jump(20, 2)
+            while self.display.sprites.get_loc()[1] < initial_y:
+                pass
             self.reward -= 1
+        self.reward = self.display.calc_reward(self.reward)
         done = self.render()
         obs = self.process_image()
         if done:
-            self.reward -= 20
             self.reset()
 
-        return obs, torch.tensor([self.reward], device="cpu"), done, {}
+        return obs, torch.tensor([self.reward], device=self.device), done, {}
 
     def reset(self):
         self.display.reset()
+        self.reward = 0
         return self.process_image()
 
     def process_image(self):
@@ -68,10 +74,11 @@ class FlappyBirdEnv(Env):
 
         resize = T.Compose([T.ToPILImage(), T.ToTensor()])
 
-        return resize(bnw_frame).unsqueeze(0).to("cpu")
+        return resize(bnw_frame).unsqueeze(0).to(self.device)
 
     def render(self, mode="human", close=False):
-        return self.display.draw_frame(FPS)
+        self.clock.tick(FPS)
+        return self.display.draw_frame()
 
 
 
