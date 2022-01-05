@@ -238,8 +238,8 @@ class Display:
             self.window.blit(self.sprites.get_img(), self.sprites.get_loc())
 
         if self.bools["started"]:
-            pipe_y = random.randint(-200, -30)
-            pipe_set = Pipes(self.obstacles[0], pipe_x, pipe_y, self.obstacles[1], pipe_y + 500)
+            pipe_y = random.randint(-150, -30)
+            pipe_set = Pipes(self.obstacles[0], pipe_x, pipe_y, self.obstacles[1], pipe_y + 450)
             pipes, pipes_hb = pipe_set.store_pipes(pipes, pipes_hb)
             for pipe in pipes:
                 pipe.draw(self.window)
@@ -296,10 +296,6 @@ class Display:
             if len(birds) == 0:
                 break
 
-            if self.score > 50:
-                pickle.dump(nets[0], open("best.pickle", "wb"))
-                break
-
             pygame.display.update()
 
         self.gen += 1
@@ -307,9 +303,9 @@ class Display:
 
     def get_dist(self, sprite_hb, pipe_hbs, above):
         curr_pipe = 0
-        while curr_pipe < len(pipe_hbs) and self.extract(pipe_hbs, curr_pipe, 0).x + 82 < (sprite_hb.x + sprite_hb.w / 2):
+        while curr_pipe < len(pipe_hbs) and self.extract(pipe_hbs, curr_pipe, 0).x + 82 < sprite_hb.x:
             curr_pipe += 1
-        x_dist = self.extract(pipe_hbs, curr_pipe, 0).x + 82 - sprite_hb.x - sprite_hb.w / 2
+        x_dist = self.extract(pipe_hbs, curr_pipe, 0).x + 82 - sprite_hb.x
         if above:
             y_dist = self.extract(pipe_hbs, curr_pipe, 0).y + self.extract(pipe_hbs, curr_pipe, 1).h - sprite_hb.y
         else:

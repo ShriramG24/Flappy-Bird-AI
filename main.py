@@ -1,10 +1,11 @@
 import pygame
 import neat
+import pickle
 from display import Display
 from sprite import Sprite
 
 pygame.init()
-fps = 40
+fps = 30
 win_width = 500
 win_height = 600
 
@@ -38,7 +39,6 @@ def run(config_path):
     pop.add_reporter(stats)
     survivor = pop.run(screen.fitness_eval, 50)
     print('\nBest genome:\n{!s}'.format(survivor))
-
 
 
 # Run AI Training
