@@ -33,9 +33,7 @@ class Pipes:
 
     def draw(self, surface):
         surface.blit(self.pipe_above, (self.x, self.y1))
-        # pygame.draw.rect(surface, (255, 0, 0), self.above_hitbox, 2)
         surface.blit(self.pipe_below, (self.x, self.y2))
-        # pygame.draw.rect(surface, (255, 0, 0), self.below_hitbox, 2)
 
     def store_pipes(self, pipes, pipes_hb):
         pipes.append(self)
